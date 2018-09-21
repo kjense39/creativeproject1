@@ -1,4 +1,4 @@
-var frame, move, player, obstacle, loop;
+var frame, move, player, block, loop;
 
 frame = document.querySelector("canvas").getContext("2d");
 
@@ -9,19 +9,17 @@ player = {
     height:30,
     width:30,
     jump:true,
-    x:144,
-    x_speed:0,
-    y:0,
+    x:80,
+    y:150,
     y_speed:0,
 };
 
-obstacle = {
-    height: 30,
+block = {
+    height: 20,
     width: 20,
-    x: 300,
-    x_speed:0,
-    y:0,
-    y_speed:0,
+    x: 280,
+    x_speed: -3,
+    y:160,
 };
 
 move = {
@@ -46,23 +44,20 @@ move = {
 };
 
 loop = function() {
+    
+    block.x += block.x_speed;
+    
+    if (block.x < -20) {
+        block.x = 320
+    }
+    
     if (move.up && player.jump == false) {
         player.y_speed -= 20;
         player.jump = true;
     }
     
-    if (move.left) {
-        player.x_speed -=0.5;
-    }
-    
-    if (move.right) {
-        player.x_speed += 0.5;
-    }
-    
-    player.y_speed += 1;
-    player.x += player.x_speed;
+    player.y_speed += .9;
     player.y += player.y_speed;
-    player.x_speed *= .9;
     player.y_speed *= .9;
     
     if (player.y > 150) {
@@ -71,12 +66,6 @@ loop = function() {
         player.y_speed = 0;
     }
     
-    if (player.x < -30) { //teleports from side to side
-        player.x = 320;
-    }
-    else if (player.x > 320) {
-        player.x = -30;
-    }
     
     frame.fillStyle = "#d6d6d6";
     frame.fillRect(0,0,320,200);
@@ -84,8 +73,18 @@ loop = function() {
     frame.beginPath();
     frame.rect(player.x, player.y, player.width, player.height);
     frame.fill();
+    frame.fillStyle = "blue";
+    frame.beginPath();
+    frame.rect(block.x, block.y, block.width, block.height);
+    frame.fill();
     
-    window.requestAnimationFrame(loop);
+    if (!(player.x < block.x + block.width &&
+        player.x + player.width > block.x &&
+        player.y < block.y + block.height &&
+        player.y + player.height > block.y)) {
+            window.requestAnimationFrame(loop);
+        }
+    
 };
 
 window.addEventListener("keydown", move.keyPress)
